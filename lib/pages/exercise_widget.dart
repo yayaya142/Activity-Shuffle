@@ -6,7 +6,7 @@ import 'package:sharp_shooter_pro/theme.dart';
 import 'package:sharp_shooter_pro/services/shared_preferences_service.dart'
     as globals;
 
-const double selectTodayExercisesSize = 24.0;
+const double selectTodayExercisesSize = 22.0;
 
 class ExerciseWidget extends StatefulWidget {
   const ExerciseWidget({super.key});

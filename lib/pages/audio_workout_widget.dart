@@ -5,6 +5,8 @@ import 'package:sharp_shooter_pro/services/exercise_api.dart';
 import 'package:sharp_shooter_pro/services/shared_preferences_service.dart'
     as globals;
 
+const double setAudioWorkoutTimeTextSize = 20;
+
 class AudioWorkoutWidget extends StatefulWidget {
   const AudioWorkoutWidget({super.key});
 
@@ -76,14 +78,15 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Set Audio Workout Time Range',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                'Cooldown Threshold',
+                style: TextStyle(
+                    fontSize: setAudioWorkoutTimeTextSize,
+                    fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 20),
 
               // RangeSlider for min and max times
               Text(
-                  'Workout Time Range: ${workoutRange.start.toInt()} - ${workoutRange.end.toInt()} seconds'),
+                  'Waits randomly between ${workoutRange.start.toInt()} and ${workoutRange.end.toInt()} seconds between audio exercise.'),
               RangeSlider(
                 values: workoutRange,
                 min: 1,
@@ -107,15 +110,20 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
 
               // Start/Stop buttons
               if (!isWorkoutActive)
-                ElevatedButton(
-                  onPressed: _startWorkout,
-                  child: const Text('Start Audio Workout'),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _startWorkout,
+                    child: const Text('Start Audio Workout'),
+                  ),
                 )
               else
-                ElevatedButton(
-                  onPressed: _stopWorkout,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: const Text('Stop Audio Workout'),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _stopWorkout,
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    child: const Text('Stop Audio Workout'),
+                  ),
                 ),
             ],
           ),
