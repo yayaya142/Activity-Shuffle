@@ -2,8 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:sharp_shooter_pro/pages/home.dart';
+import 'package:sharp_shooter_pro/services/shared_preferences_service.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Required for async operations in main
+  await SharedPreferencesService().init(); // Initialize SharedPreferences
+
   runApp(MyApp());
 }
 
