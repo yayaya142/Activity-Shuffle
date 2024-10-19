@@ -10,10 +10,7 @@ class ExerciseAPI {
 
   // Default exercises (cannot be deleted)
   final List<Exercise> defaultExercises = [
-    Exercise(name: "Target A", ttsFile: "target_a.mp3"),
-    Exercise(name: "Target B", ttsFile: "target_b.mp3"),
-    Exercise(name: "Target C", ttsFile: "target_c.mp3"),
-    Exercise(name: "Target D", ttsFile: "target_d.mp3"),
+    Exercise(name: "Demo Exercise", ttsFile: "demo_exercise.mp3"),
   ];
 
   // Constructor to initialize the API and load saved data

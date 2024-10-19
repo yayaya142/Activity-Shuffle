@@ -12,7 +12,6 @@ class TimerAPI {
 
   // Start the timer for a given duration
   void startTimer(int time, {VoidCallback? onComplete}) {
-    time = 5;
     defaultTime = time;
     remainingTime = time;
     isPaused = false;

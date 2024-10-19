@@ -8,8 +8,8 @@ import 'package:sharp_shooter_pro/services/shared_preferences_service.dart'
     as globals;
 
 class AudioWorkoutAPI {
-  int minTime = 30; // Default minimum value in seconds
-  int maxTime = 120; // Default maximum value in seconds
+  int minTime = 3; // Default minimum value in seconds
+  int maxTime = 10; // Default maximum value in seconds
   FlutterTts flutterTts = FlutterTts(); // Text-to-Speech instance
   ValueNotifier<String> lastPickedExercise =
       ValueNotifier<String>(''); // Last picked exercise

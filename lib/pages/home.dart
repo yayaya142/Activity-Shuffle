@@ -12,7 +12,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hello World Page'),
+        title: const Center(child: Text('Activity Shuffle')),
         backgroundColor: ThemeColors().appBarColor,
       ),
       body: const SingleChildScrollView(
