@@ -1,10 +1,17 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart'; // For CupertinoPicker
-import 'package:sharp_shooter_pro/services/timer_api.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:sharp_shooter_pro/services/timer_api.dart'; // For CupertinoPicker
+
+const double timerFunctionButtonSize = 20.0;
+const double timerTextSize = 50.0;
 
 class TimerWidget extends StatefulWidget {
+  const TimerWidget({super.key});
+
   @override
   _TimerWidgetState createState() => _TimerWidgetState();
 }
@@ -21,7 +28,7 @@ class _TimerWidgetState extends State<TimerWidget> {
   void initState() {
     super.initState();
     // Set up a UI timer that updates every second
-    _uiUpdateTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _uiUpdateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {});
     });
   }
@@ -38,8 +45,9 @@ class _TimerWidgetState extends State<TimerWidget> {
       selectedTime = time;
       if (time != 'Custom') {
         int selectedMinutes = int.parse(time);
-        timerAPI.startTimer(selectedMinutes *
-            60); // Start the timer with the selected time in seconds
+        timerAPI.startTimer(selectedMinutes * 60,
+            onComplete:
+                _resetTimer); // Start the timer with the selected time in seconds
         isTimerStarted = true; // Mark timer as started
       } else {
         // Open wheel slider for custom time selection
@@ -53,13 +61,13 @@ class _TimerWidgetState extends State<TimerWidget> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
+        return SizedBox(
           height: 250,
           child: Column(
             children: [
-              SizedBox(height: 10),
-              Text(
-                'Select Custom Time (minutes)',
+              const SizedBox(height: 10),
+              const Text(
+                'Select Custom Time',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Expanded(
@@ -79,7 +87,7 @@ class _TimerWidgetState extends State<TimerWidget> {
                     return Center(
                       child: Text(
                         '${index + 1} min',
-                        style: TextStyle(fontSize: 20),
+                        style: const TextStyle(fontSize: 20),
                       ),
                     );
                   }),
@@ -89,13 +97,13 @@ class _TimerWidgetState extends State<TimerWidget> {
                 onPressed: () {
                   // Start the timer with the selected custom time
                   setState(() {
-                    timerAPI.startTimer(
-                        customMinutes * 60); // Start timer in seconds
+                    timerAPI.startTimer(customMinutes * 60,
+                        onComplete: _resetTimer); // Start timer in seconds
                     isTimerStarted = true; // Mark timer as started
                     Navigator.pop(context); // Close the bottom sheet
                   });
                 },
-                child: Text('Set Timer'),
+                child: const Text('Set Timer'),
               ),
             ],
           ),
@@ -125,8 +133,8 @@ class _TimerWidgetState extends State<TimerWidget> {
   // Function to resume the timer
   void _resumeTimer() {
     setState(() {
-      timerAPI.resumeTimer(); // Resume the timer in the API
-      isTimerPaused = false; // Unmark paused
+      timerAPI.resumeTimer();
+      isTimerPaused = false;
     });
   }
 
@@ -135,12 +143,19 @@ class _TimerWidgetState extends State<TimerWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Display the remaining time
-        Text(
-          'Time: ${timerAPI.getRemainingTimeFormatted()}',
-        ),
+        if (isTimerStarted == true)
+          Center(
+            child: Text(
+              timerAPI.getRemainingTimeFormatted(),
+              style: const TextStyle(
+                fontSize: timerTextSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
 
-        SizedBox(height: 20),
+        const SizedBox(height: 10),
 
         // Show the time selection buttons only if the timer hasn't started
         if (!isTimerStarted)
@@ -154,34 +169,44 @@ class _TimerWidgetState extends State<TimerWidget> {
             ],
           ),
 
-        SizedBox(height: 20),
-
         // Show the control buttons based on timer state (started/paused)
         if (isTimerStarted && !isTimerPaused) ...[
-          // Pause button with icon
-          IconButton(
-            icon: Icon(Icons.pause, size: 40, color: Colors.blue), // Pause icon
-            onPressed: _pauseTimer,
+          // Pause button centered horizontally
+          Center(
+            child: IconButton(
+              icon: const Icon(Icons.pause,
+                  size: timerFunctionButtonSize,
+                  color: Colors.blue), // Pause icon
+              onPressed: _pauseTimer,
+            ),
           ),
         ] else if (isTimerPaused) ...[
-          // Resume button with icon
-          IconButton(
-            icon: Icon(Icons.play_arrow,
-                size: 40, color: Colors.green), // Play icon
-            onPressed: _resumeTimer,
-          ),
-          // Reset button with icon
-          IconButton(
-            icon: Icon(Icons.replay,
-                size: 40, color: Colors.red), // Replay/Reset icon
-            onPressed: _resetTimer,
+          // Row with Resume and Reset buttons centered
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center, // Center the row
+            children: [
+              IconButton(
+                icon: const Icon(Icons.play_arrow,
+                    size: timerFunctionButtonSize,
+                    color: Colors.green), // Play icon
+                onPressed: _resumeTimer,
+              ),
+              const SizedBox(width: 30), // Space between buttons
+              IconButton(
+                icon: const Icon(Icons.replay,
+                    size: timerFunctionButtonSize,
+                    color: Colors.red), // Replay/Reset icon
+                onPressed: _resetTimer,
+              ),
+            ],
           ),
         ],
 
         // Show reset button if the timer has been paused or completed
         if (!isTimerStarted && isTimerPaused)
           IconButton(
-            icon: Icon(Icons.replay, size: 40, color: Colors.red), // Reset icon
+            icon: const Icon(Icons.replay,
+                size: timerFunctionButtonSize, color: Colors.red), // Reset icon
             onPressed: _resetTimer,
           ),
       ],
@@ -192,8 +217,7 @@ class _TimerWidgetState extends State<TimerWidget> {
   Widget _buildTimeOptionButton(String time) {
     return ElevatedButton(
       onPressed: () => _onTimeButtonPressed(time),
-      style: ElevatedButton.styleFrom(// Highlight the selected button
-          ),
+      style: ElevatedButton.styleFrom(),
       child: Text(time == 'Custom' ? time : '$time min'),
     );
   }

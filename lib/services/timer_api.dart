@@ -1,31 +1,36 @@
 import 'dart:async';
+import 'dart:ui';
+import 'package:audioplayers/audioplayers.dart';
 
 class TimerAPI {
   int defaultTime = 900; // Default timer duration in seconds
   int remainingTime = 900; // Remaining time in seconds
   Timer? _timer; // The Timer object
   bool isPaused = false; // To track if the timer is paused
+  final AudioPlayer _audioPlayer = AudioPlayer(); // Audio player instance
+  VoidCallback? onTimerComplete; // Callback for timer completion
 
   // Start the timer for a given duration
-  void startTimer(int time) {
+  void startTimer(int time, {VoidCallback? onComplete}) {
     defaultTime = time;
     remainingTime = time;
     isPaused = false;
+    onTimerComplete = onComplete;
 
     _timer?.cancel(); // Cancel any existing timer if running
 
     // Start a new periodic timer to count down every second
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (remainingTime > 0) {
         remainingTime--;
-        print('Remaining time: ${getRemainingTimeFormatted()}');
       } else {
         _timer?.cancel();
-        print('Timer finished');
+        playSound(); // Play sound when timer finishes
+        if (onTimerComplete != null) {
+          onTimerComplete!(); // Call the completion callback
+        }
       }
     });
-
-    print('Timer started for $time seconds');
   }
 
   // Reset the timer back to the default time
@@ -33,7 +38,6 @@ class TimerAPI {
     _timer?.cancel();
     remainingTime = defaultTime;
     isPaused = false;
-    print('Timer reset to $defaultTime seconds');
   }
 
   // Pause the timer and save remaining time
@@ -41,7 +45,6 @@ class TimerAPI {
     if (_timer != null && !isPaused) {
       _timer?.cancel(); // Cancel the current timer to pause it
       isPaused = true; // Mark the timer as paused
-      print('Timer paused at ${getRemainingTimeFormatted()}');
     }
   }
 
@@ -49,16 +52,17 @@ class TimerAPI {
   void resumeTimer() {
     if (isPaused) {
       isPaused = false; // Mark the timer as resumed
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (remainingTime > 0) {
           remainingTime--;
-          print('Remaining time: ${getRemainingTimeFormatted()}');
         } else {
           _timer?.cancel();
-          print('Timer finished');
+          playSound(); // Play sound when timer finishes
+          if (onTimerComplete != null) {
+            onTimerComplete!(); // Call the completion callback
+          }
         }
       });
-      print('Timer resumed');
     }
   }
 
@@ -69,5 +73,10 @@ class TimerAPI {
     String minutesStr = minutes.toString().padLeft(2, '0');
     String secondsStr = seconds.toString().padLeft(2, '0');
     return '$minutesStr:$secondsStr';
+  }
+
+  // Play a sound when the timer finishes
+  void playSound() async {
+    await _audioPlayer.play('assets/sounds/timer_finish.mp3');
   }
 }
