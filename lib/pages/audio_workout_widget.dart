@@ -1,11 +1,15 @@
+// audio_workout_widget.dart
 import 'package:flutter/material.dart';
 import 'package:sharp_shooter_pro/services/audio_workout_api.dart';
 import 'package:sharp_shooter_pro/services/exercise_api.dart';
+import 'package:sharp_shooter_pro/services/shared_preferences_service.dart'
+    as globals;
 
 class AudioWorkoutWidget extends StatefulWidget {
   const AudioWorkoutWidget({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _AudioWorkoutWidgetState createState() => _AudioWorkoutWidgetState();
 }
 
@@ -13,7 +17,6 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
   final AudioWorkoutAPI audioWorkoutAPI = AudioWorkoutAPI(); // Instance of API
   final ExerciseAPI exerciseAPI = ExerciseAPI(); // Instance of exercise API
   RangeValues workoutRange = const RangeValues(30, 120); // Initial range values
-  bool isWorkoutActive = false; // To track workout state
 
   @override
   void initState() {
@@ -37,18 +40,19 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
   // Start workout function
   void _startWorkout() async {
     setState(() {
-      isWorkoutActive = true; // Enable the "Stop" button
+      globals.audioWorkoutActive.value = true; // Enable the "Stop" button
     });
 
     try {
       // Start audio workout
       await audioWorkoutAPI.startAudioWorkout();
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );
       setState(() {
-        isWorkoutActive = false; // Reset the workout state
+        globals.audioWorkoutActive.value = false; // Reset the workout state
       });
     }
   }
@@ -56,60 +60,67 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
   // Stop workout function
   void _stopWorkout() {
     setState(() {
-      isWorkoutActive = false; // Disable the "Stop" button
+      globals.audioWorkoutActive.value = false; // Disable the "Stop" button
     });
     audioWorkoutAPI.stopAudioWorkout();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Set Audio Workout Time Range',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
+    return ValueListenableBuilder<bool>(
+      valueListenable: globals.audioWorkoutActive,
+      builder: (context, isWorkoutActive, child) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Set Audio Workout Time Range',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
 
-          // RangeSlider for min and max times
-          Text(
-              'Workout Time Range: ${workoutRange.start.toInt()} - ${workoutRange.end.toInt()} seconds'),
-          RangeSlider(
-            values: workoutRange,
-            min: 1,
-            max: 300,
-            divisions: 299, // 1-second increments
-            labels: RangeLabels(
-              workoutRange.start.round().toString(),
-              workoutRange.end.round().toString(),
-            ),
-            onChanged: (RangeValues newRange) {
-              setState(() {
-                workoutRange = newRange;
-              });
-              // Auto-save when the slider is changed
-              _saveWorkoutRange(newRange.start, newRange.end);
-            },
-          ),
-          const SizedBox(height: 20),
+              // RangeSlider for min and max times
+              Text(
+                  'Workout Time Range: ${workoutRange.start.toInt()} - ${workoutRange.end.toInt()} seconds'),
+              RangeSlider(
+                values: workoutRange,
+                min: 1,
+                max: 300,
+                divisions: 299, // 1-second increments
+                labels: RangeLabels(
+                  workoutRange.start.round().toString(),
+                  workoutRange.end.round().toString(),
+                ),
+                onChanged: isWorkoutActive
+                    ? null
+                    : (RangeValues newRange) {
+                        setState(() {
+                          workoutRange = newRange;
+                        });
+                        // Auto-save when the slider is changed
+                        _saveWorkoutRange(newRange.start, newRange.end);
+                      },
+              ),
+              const SizedBox(height: 20),
 
-          // Start/Stop buttons
-          if (!isWorkoutActive)
-            ElevatedButton(
-              onPressed: _startWorkout,
-              child: const Text('Start Audio Workout'),
-            )
-          else
-            ElevatedButton(
-              onPressed: _stopWorkout,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Stop Audio Workout'),
-            ),
-        ],
-      ),
+              // Start/Stop buttons
+              if (!isWorkoutActive)
+                ElevatedButton(
+                  onPressed: _startWorkout,
+                  child: const Text('Start Audio Workout'),
+                )
+              else
+                ElevatedButton(
+                  onPressed: _stopWorkout,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child: const Text('Stop Audio Workout'),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

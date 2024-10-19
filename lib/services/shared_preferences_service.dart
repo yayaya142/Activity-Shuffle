@@ -1,4 +1,9 @@
+library my_app.globals;
+
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+
+ValueNotifier<bool> audioWorkoutActive = ValueNotifier<bool>(false);
 
 class SharedPreferencesService {
   static final SharedPreferencesService _instance =

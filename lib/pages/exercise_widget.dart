@@ -1,7 +1,10 @@
+// exercise_widget.dart
 // ignore_for_file: library_private_types_in_public_api
 import 'package:flutter/material.dart';
 import 'package:sharp_shooter_pro/services/exercise_api.dart';
 import 'package:sharp_shooter_pro/theme.dart';
+import 'package:sharp_shooter_pro/services/shared_preferences_service.dart'
+    as globals;
 
 const double selectTodayExercisesSize = 24.0;
 
@@ -115,75 +118,86 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Row for title and Add Exercise button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ValueListenableBuilder<bool>(
+      valueListenable: globals.audioWorkoutActive,
+      builder: (context, isWorkoutActive, child) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Expanded(
-                child: Text(
-                  'Select Today\'s Exercises',
-                  style: TextStyle(
-                      fontSize: selectTodayExercisesSize,
-                      fontWeight: FontWeight.bold),
-                ),
+              // Row for title and Add Exercise button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Select Today\'s Exercises',
+                      style: TextStyle(
+                          fontSize: selectTodayExercisesSize,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  // Add Exercise button
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    color: Colors.green,
+                    onPressed: isWorkoutActive ? null : _showAddExerciseDialog,
+                  ),
+                  IconButton(
+                      icon: const Icon(Icons.delete),
+                      color: Colors.red,
+                      onPressed: isWorkoutActive
+                          ? null
+                          : _showDeleteConfirmationDialog),
+                ],
               ),
-              // Add Exercise button
-              IconButton(
-                icon: const Icon(Icons.add),
-                color: Colors.green,
-                onPressed: _showAddExerciseDialog,
+              const SizedBox(height: 20),
+
+              // Multi-select choice chips
+              Wrap(
+                spacing: 8.0, // Space between chips
+                children: exerciseAPI.exercises.map((exercise) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 4.0), // Padding between each chip
+                    child: ChoiceChip(
+                      label: Text(exercise.name),
+                      selected: selectedExercises.contains(exercise.name),
+                      selectedColor:
+                          ThemeColors().selectExerciseButtonColorSelected,
+                      backgroundColor:
+                          ThemeColors().selectExerciseButtonColorNotSelected,
+                      labelStyle: TextStyle(
+                        color: selectedExercises.contains(exercise.name)
+                            ? ThemeColors().selectExerciseTextColorSelected
+                            : ThemeColors().selectExerciseTextColorNotSelected,
+                      ),
+                      onSelected: isWorkoutActive
+                          ? null
+                          : (bool selected) {
+                              setState(() {
+                                if (selected) {
+                                  selectedExercises.add(exercise.name);
+                                  _speakExercise(
+                                      exercise.name); // Speak exercise name
+                                } else {
+                                  selectedExercises.remove(exercise.name);
+                                }
+                                exerciseAPI.selectedExercises =
+                                    selectedExercises;
+                                exerciseAPI
+                                    .saveSelectedExercises(); // Save updated selections
+                              });
+                            },
+                    ),
+                  );
+                }).toList(),
               ),
-              IconButton(
-                  icon: const Icon(Icons.delete),
-                  color: Colors.red,
-                  onPressed: _showDeleteConfirmationDialog),
             ],
           ),
-          const SizedBox(height: 20),
-
-          // Multi-select choice chips
-          Wrap(
-            spacing: 8.0, // Space between chips
-            children: exerciseAPI.exercises.map((exercise) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 4.0), // Padding between each chip
-                child: ChoiceChip(
-                  label: Text(exercise.name),
-                  selected: selectedExercises.contains(exercise.name),
-                  selectedColor:
-                      ThemeColors().selectExerciseButtonColorSelected,
-                  backgroundColor:
-                      ThemeColors().selectExerciseButtonColorNotSelected,
-                  labelStyle: TextStyle(
-                    color: selectedExercises.contains(exercise.name)
-                        ? ThemeColors().selectExerciseTextColorSelected
-                        : ThemeColors().selectExerciseTextColorNotSelected,
-                  ),
-                  onSelected: (bool selected) {
-                    setState(() {
-                      if (selected) {
-                        selectedExercises.add(exercise.name);
-                        _speakExercise(exercise.name); // Speak exercise name
-                      } else {
-                        selectedExercises.remove(exercise.name);
-                      }
-                      exerciseAPI.selectedExercises = selectedExercises;
-                      exerciseAPI
-                          .saveSelectedExercises(); // Save updated selections
-                    });
-                  },
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
