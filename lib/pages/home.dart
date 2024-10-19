@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sharp_shooter_pro/pages/exercise_widget.dart';
 import 'package:sharp_shooter_pro/pages/timer_widget.dart';
 import 'package:sharp_shooter_pro/theme.dart';
 
@@ -12,10 +13,6 @@ class Home extends StatelessWidget {
           title: const Text('Hello World Page'),
           backgroundColor: ThemeColors().appBarColor,
         ),
-        body: const Column(
-          children: [
-            TimerWidget(),
-          ],
-        ));
+        body: const ExerciseWidget());
   }
 }
