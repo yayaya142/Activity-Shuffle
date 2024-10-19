@@ -91,8 +91,8 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
               RangeSlider(
                 values: workoutRange,
                 min: 1,
-                max: 300,
-                divisions: 299, // 1-second increments
+                max: 100,
+                divisions: 99, // 1-second increments
                 labels: RangeLabels(
                   workoutRange.start.round().toString(),
                   workoutRange.end.round().toString(),

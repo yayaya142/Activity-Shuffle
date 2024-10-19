@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ThemeColors {
 // app bar colors
-  Color appBarColor = const Color.fromARGB(255, 141, 223, 243);
+  Color appBarColor = const Color.fromARGB(225, 101, 73, 154);
 // body colors
   Color primaryBackgroundColor = const Color(0xff7a6161);
   Color secondaryBackgroundColor = Colors.blue;

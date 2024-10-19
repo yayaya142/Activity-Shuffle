@@ -9,9 +9,7 @@ class ExerciseAPI {
   final FlutterTts flutterTts = FlutterTts(); // Text-to-Speech instance
 
   // Default exercises (cannot be deleted)
-  final List<Exercise> defaultExercises = [
-    Exercise(name: "Demo Exercise", ttsFile: "demo_exercise.mp3"),
-  ];
+  final List<Exercise> defaultExercises = [];
 
   // Constructor to initialize the API and load saved data
   ExerciseAPI() {
