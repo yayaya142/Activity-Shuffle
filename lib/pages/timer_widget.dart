@@ -160,14 +160,17 @@ class _TimerWidgetState extends State<TimerWidget> {
 
         // Show the time selection buttons only if the timer hasn't started
         if (!isTimerStarted)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildTimeOptionButton('10'),
-              _buildTimeOptionButton('15'),
-              _buildTimeOptionButton('20'),
-              _buildTimeOptionButton('Custom'),
-            ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(7, 0, 7, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildTimeOptionButton('10'),
+                _buildTimeOptionButton('15'),
+                _buildTimeOptionButton('20'),
+                _buildTimeOptionButton('Custom'),
+              ],
+            ),
           ),
 
         // Show the control buttons based on timer state (started/paused)
@@ -220,7 +223,7 @@ class _TimerWidgetState extends State<TimerWidget> {
       onPressed: () => _onTimeButtonPressed(time),
       style: ElevatedButton.styleFrom(
           backgroundColor: ThemeColors().timerOptionsBackgroundColor),
-      child: Text(time == 'Custom' ? time : '$time min',
+      child: Text(time == 'Custom' ? time : '$time ',
           style: TextStyle(color: ThemeColors().timerOptionsTextColor)),
     );
   }

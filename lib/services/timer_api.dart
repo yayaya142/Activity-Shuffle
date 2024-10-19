@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 
 class TimerAPI {
   int defaultTime = 900; // Default timer duration in seconds
@@ -12,6 +12,7 @@ class TimerAPI {
 
   // Start the timer for a given duration
   void startTimer(int time, {VoidCallback? onComplete}) {
+    time = 5;
     defaultTime = time;
     remainingTime = time;
     isPaused = false;
@@ -77,6 +78,12 @@ class TimerAPI {
 
   // Play a sound when the timer finishes
   void playSound() async {
-    await _audioPlayer.play('assets/sounds/timer_finish.mp3');
+    try {
+      await _audioPlayer.setAsset('assets/sounds/timer_finish.mp3');
+      _audioPlayer.play();
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error playing sound: $e');
+    }
   }
 }
