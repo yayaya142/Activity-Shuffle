@@ -7,5 +7,8 @@ class ThemeColors {
   Color primaryBackgroundColor = const Color(0xff7a6161);
   Color secondaryBackgroundColor = Colors.blue;
   Color backgroundContainerColor = Colors.white;
-  // fonts
+
+// timer colors
+  Color timerOptionsTextColor = Colors.black;
+  Color timerOptionsBackgroundColor = Colors.white;
 }

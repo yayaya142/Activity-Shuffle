@@ -4,7 +4,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sharp_shooter_pro/services/timer_api.dart'; // For CupertinoPicker
+import 'package:sharp_shooter_pro/services/timer_api.dart';
+import 'package:sharp_shooter_pro/theme.dart'; // For CupertinoPicker
 
 const double timerFunctionButtonSize = 20.0;
 const double timerTextSize = 50.0;
@@ -217,8 +218,10 @@ class _TimerWidgetState extends State<TimerWidget> {
   Widget _buildTimeOptionButton(String time) {
     return ElevatedButton(
       onPressed: () => _onTimeButtonPressed(time),
-      style: ElevatedButton.styleFrom(),
-      child: Text(time == 'Custom' ? time : '$time min'),
+      style: ElevatedButton.styleFrom(
+          backgroundColor: ThemeColors().timerOptionsBackgroundColor),
+      child: Text(time == 'Custom' ? time : '$time min',
+          style: TextStyle(color: ThemeColors().timerOptionsTextColor)),
     );
   }
 }
