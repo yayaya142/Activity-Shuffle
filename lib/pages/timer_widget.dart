@@ -12,8 +12,10 @@ class TimerWidget extends StatefulWidget {
 class _TimerWidgetState extends State<TimerWidget> {
   TimerAPI timerAPI = TimerAPI();
   late Timer _uiUpdateTimer; // Timer to update the UI every second
-  String selectedTime = '15'; // Default selected time
+  String selectedTime = '10'; // Default selected time
   int customMinutes = 1; // Store the selected custom time (default 1 minute)
+  bool isTimerStarted = false; // Track if the timer is started
+  bool isTimerPaused = false; // Track if the timer is paused
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _TimerWidgetState extends State<TimerWidget> {
         int selectedMinutes = int.parse(time);
         timerAPI.startTimer(selectedMinutes *
             60); // Start the timer with the selected time in seconds
+        isTimerStarted = true; // Mark timer as started
       } else {
         // Open wheel slider for custom time selection
         _showCustomTimePicker();
@@ -88,6 +91,7 @@ class _TimerWidgetState extends State<TimerWidget> {
                   setState(() {
                     timerAPI.startTimer(
                         customMinutes * 60); // Start timer in seconds
+                    isTimerStarted = true; // Mark timer as started
                     Navigator.pop(context); // Close the bottom sheet
                   });
                 },
@@ -98,6 +102,32 @@ class _TimerWidgetState extends State<TimerWidget> {
         );
       },
     );
+  }
+
+  // Function to reset the timer and show the time selection options again
+  void _resetTimer() {
+    setState(() {
+      timerAPI.resetTimer(); // Reset the timer in the API
+      isTimerStarted = false; // Mark timer as not started
+      isTimerPaused = false; // Ensure it's not paused either
+      selectedTime = '10'; // Reset the selected time to default
+    });
+  }
+
+  // Function to pause the timer
+  void _pauseTimer() {
+    setState(() {
+      timerAPI.pauseTimer(); // Pause the timer in the API
+      isTimerPaused = true; // Mark timer as paused
+    });
+  }
+
+  // Function to resume the timer
+  void _resumeTimer() {
+    setState(() {
+      timerAPI.resumeTimer(); // Resume the timer in the API
+      isTimerPaused = false; // Unmark paused
+    });
   }
 
   @override
@@ -112,59 +142,48 @@ class _TimerWidgetState extends State<TimerWidget> {
 
         SizedBox(height: 20),
 
-        // Row with predefined time options: 10, 15, 20, and Custom
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Predefined buttons for 10, 15, 20, and Custom
-            _buildTimeOptionButton('10'),
-            _buildTimeOptionButton('15'),
-            _buildTimeOptionButton('20'),
-            _buildTimeOptionButton('Custom'),
-          ],
-        ),
+        // Show the time selection buttons only if the timer hasn't started
+        if (!isTimerStarted)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildTimeOptionButton('10'),
+              _buildTimeOptionButton('15'),
+              _buildTimeOptionButton('20'),
+              _buildTimeOptionButton('Custom'),
+            ],
+          ),
 
         SizedBox(height: 20),
 
-        // Buttons for controlling the timer
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  timerAPI.startTimer(int.parse(selectedTime) *
-                      60); // Start the timer for the selected duration
-                });
-              },
-              child: Text('Start'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  timerAPI.pauseTimer(); // Pause the timer
-                });
-              },
-              child: Text('Pause'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  timerAPI.resumeTimer(); // Resume the timer
-                });
-              },
-              child: Text('Resume'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  timerAPI.resetTimer(); // Reset the timer
-                });
-              },
-              child: Text('Reset'),
-            ),
-          ],
-        ),
+        // Show the control buttons based on timer state (started/paused)
+        if (isTimerStarted && !isTimerPaused) ...[
+          // Pause button with icon
+          IconButton(
+            icon: Icon(Icons.pause, size: 40, color: Colors.blue), // Pause icon
+            onPressed: _pauseTimer,
+          ),
+        ] else if (isTimerPaused) ...[
+          // Resume button with icon
+          IconButton(
+            icon: Icon(Icons.play_arrow,
+                size: 40, color: Colors.green), // Play icon
+            onPressed: _resumeTimer,
+          ),
+          // Reset button with icon
+          IconButton(
+            icon: Icon(Icons.replay,
+                size: 40, color: Colors.red), // Replay/Reset icon
+            onPressed: _resetTimer,
+          ),
+        ],
+
+        // Show reset button if the timer has been paused or completed
+        if (!isTimerStarted && isTimerPaused)
+          IconButton(
+            icon: Icon(Icons.replay, size: 40, color: Colors.red), // Reset icon
+            onPressed: _resetTimer,
+          ),
       ],
     );
   }
@@ -173,7 +192,8 @@ class _TimerWidgetState extends State<TimerWidget> {
   Widget _buildTimeOptionButton(String time) {
     return ElevatedButton(
       onPressed: () => _onTimeButtonPressed(time),
-      style: ElevatedButton.styleFrom(),
+      style: ElevatedButton.styleFrom(// Highlight the selected button
+          ),
       child: Text(time == 'Custom' ? time : '$time min'),
     );
   }
