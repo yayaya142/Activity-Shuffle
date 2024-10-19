@@ -16,6 +16,20 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
   ExerciseAPI exerciseAPI = ExerciseAPI();
   List<String> selectedExercises = []; // Track selected exercises
 
+  @override
+  void initState() {
+    super.initState();
+    loadSelectedExercises();
+  }
+
+  // Load selected exercises from the API
+  void loadSelectedExercises() async {
+    await exerciseAPI.loadSelectedExercises();
+    setState(() {
+      selectedExercises = exerciseAPI.selectedExercises;
+    });
+  }
+
   // Method to show a dialog for adding a new exercise
   void _showAddExerciseDialog() {
     TextEditingController controller = TextEditingController();
@@ -77,6 +91,8 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
                     exerciseAPI.deleteExercise(exerciseName);
                   }
                   selectedExercises.clear(); // Clear selections after deletion
+                  exerciseAPI
+                      .saveSelectedExercises(); // Save updated selections
                 });
                 Navigator.of(context).pop(); // Close dialog
               },
@@ -157,6 +173,9 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
                       } else {
                         selectedExercises.remove(exercise.name);
                       }
+                      exerciseAPI.selectedExercises = selectedExercises;
+                      exerciseAPI
+                          .saveSelectedExercises(); // Save updated selections
                     });
                   },
                 ),

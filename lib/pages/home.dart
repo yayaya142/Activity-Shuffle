@@ -17,8 +17,8 @@ class Home extends StatelessWidget {
       body: const SingleChildScrollView(
         child: Column(
           children: [
-            // TimerWidget(),
-            // ExerciseWidget(),
+            TimerWidget(),
+            ExerciseWidget(),
             AudioWorkoutWidget(),
           ],
         ),

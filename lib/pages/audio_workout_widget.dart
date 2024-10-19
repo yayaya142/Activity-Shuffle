@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sharp_shooter_pro/services/audio_workout_api.dart';
+import 'package:sharp_shooter_pro/services/exercise_api.dart';
 
 class AudioWorkoutWidget extends StatefulWidget {
   const AudioWorkoutWidget({super.key});
@@ -9,8 +10,10 @@ class AudioWorkoutWidget extends StatefulWidget {
 }
 
 class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
-  AudioWorkoutAPI audioWorkoutAPI = AudioWorkoutAPI(); // Instance of API
+  final AudioWorkoutAPI audioWorkoutAPI = AudioWorkoutAPI(); // Instance of API
+  final ExerciseAPI exerciseAPI = ExerciseAPI(); // Instance of exercise API
   RangeValues workoutRange = const RangeValues(30, 120); // Initial range values
+  bool isWorkoutActive = false; // To track workout state
 
   @override
   void initState() {
@@ -29,6 +32,36 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
   // Function to automatically save the range when it changes
   void _saveWorkoutRange(double newMin, double newMax) {
     audioWorkoutAPI.saveAudioWorkoutTimes(newMin.toInt(), newMax.toInt());
+  }
+
+  // Start workout function
+  void _startWorkout() async {
+    setState(() {
+      isWorkoutActive = true; // Enable the "Stop" button
+    });
+
+    try {
+      // Get the selected exercises from ExerciseAPI
+      final selectedExercises = exerciseAPI.selectedExercises;
+
+      // Start audio workout
+      await audioWorkoutAPI.startAudioWorkout(selectedExercises);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+      setState(() {
+        isWorkoutActive = false; // Reset the workout state
+      });
+    }
+  }
+
+  // Stop workout function
+  void _stopWorkout() {
+    setState(() {
+      isWorkoutActive = false; // Disable the "Stop" button
+    });
+    audioWorkoutAPI.stopAudioWorkout();
   }
 
   @override
@@ -63,6 +96,19 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
               // Auto-save when the slider is changed
               _saveWorkoutRange(newRange.start, newRange.end);
             },
+          ),
+          const SizedBox(height: 20),
+
+          // Start/Stop buttons
+          ElevatedButton(
+            onPressed: isWorkoutActive ? null : _startWorkout,
+            child: const Text('Start Audio Workout'),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: isWorkoutActive ? _stopWorkout : null,
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Stop Audio Workout'),
           ),
         ],
       ),

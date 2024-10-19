@@ -25,7 +25,7 @@ class ExerciseAPI {
   // Load exercises from shared preferences
   Future<void> loadExercises() async {
     List<String>? exercisesJson =
-        SharedPreferencesService().getStringList('exercises');
+        SharedPreferencesService().getStringList('allExercises');
     if (exercisesJson != null && exercisesJson.isNotEmpty) {
       exercises = exercisesJson
           .map((jsonString) => Exercise.fromJson(json.decode(jsonString)))
@@ -41,7 +41,8 @@ class ExerciseAPI {
   Future<void> saveExercises() async {
     List<String> exercisesJson =
         exercises.map((exercise) => json.encode(exercise.toJson())).toList();
-    await SharedPreferencesService().saveStringList('exercises', exercisesJson);
+    await SharedPreferencesService()
+        .saveStringList('allExercises', exercisesJson);
   }
 
   // Load selected exercises from shared preferences
