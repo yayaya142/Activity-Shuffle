@@ -6,6 +6,7 @@ import 'package:sharp_shooter_pro/services/shared_preferences_service.dart'
     as globals;
 
 const double setAudioWorkoutTimeTextSize = 20;
+const double lastPickedExerciseTextSize = 25;
 
 class AudioWorkoutWidget extends StatefulWidget {
   const AudioWorkoutWidget({super.key});
@@ -125,6 +126,22 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
                     child: const Text('Stop Audio Workout'),
                   ),
                 ),
+
+              // Display the last picked exercise
+              const SizedBox(height: 10),
+              ValueListenableBuilder<String>(
+                valueListenable: audioWorkoutAPI.lastPickedExercise,
+                builder: (context, lastPickedExercise, child) {
+                  return Center(
+                    child: Text(
+                      lastPickedExercise,
+                      style: const TextStyle(
+                          fontSize: lastPickedExerciseTextSize,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         );

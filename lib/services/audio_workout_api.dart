@@ -1,6 +1,7 @@
 // audio_workout_api.dart
 import 'dart:async';
 import 'dart:math'; // For generating random numbers
+import 'package:flutter/material.dart';
 import 'package:sharp_shooter_pro/services/shared_preferences_service.dart';
 import 'package:flutter_tts/flutter_tts.dart'; // Import for text-to-speech
 import 'package:sharp_shooter_pro/services/shared_preferences_service.dart'
@@ -10,6 +11,8 @@ class AudioWorkoutAPI {
   int minTime = 30; // Default minimum value in seconds
   int maxTime = 120; // Default maximum value in seconds
   FlutterTts flutterTts = FlutterTts(); // Text-to-Speech instance
+  ValueNotifier<String> lastPickedExercise =
+      ValueNotifier<String>(''); // Last picked exercise
 
   AudioWorkoutAPI() {
     // Load saved min/max values from SharedPreferences
@@ -64,6 +67,7 @@ class AudioWorkoutAPI {
     }
 
     globals.audioWorkoutActive.value = true;
+    print("Workout started");
 
     // Wait 5 seconds before starting the workout loop
     await Future.delayed(const Duration(seconds: 5));
@@ -71,12 +75,16 @@ class AudioWorkoutAPI {
     // Workout loop
     while (globals.audioWorkoutActive.value) {
       final int waitTime = getRandomTimeInSeconds();
+      print("Waiting for $waitTime seconds");
 
       // Wait for a random time between min and max
       await Future.delayed(Duration(seconds: waitTime));
 
       // Pick a random exercise and speak it out loud
       final String exerciseName = getRandomExercise(selectedExercises);
+      lastPickedExercise.value =
+          exerciseName; // Update the last picked exercise
+      print("Selected exercise: $exerciseName");
       await flutterTts.speak(exerciseName);
 
       // Wait for another random time before repeating
@@ -89,5 +97,6 @@ class AudioWorkoutAPI {
   // Function to stop the workout
   void stopAudioWorkout() {
     globals.audioWorkoutActive.value = false;
+    print("Workout stopped");
   }
 }
