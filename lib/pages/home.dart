@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:sharp_shooter_pro/pages/timer_widget.dart';
 import 'package:sharp_shooter_pro/theme.dart';
 
 class Home extends StatelessWidget {
@@ -11,11 +14,7 @@ class Home extends StatelessWidget {
         title: const Text('Hello World Page'),
         backgroundColor: ThemeColors().appBarColor,
       ),
-      body: const Center(
-        child: Text(
-          'Hello, World!',
-        ),
-      ),
+      body: TimerWidget(),
     );
   }
 }
