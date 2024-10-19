@@ -47,6 +47,16 @@ class SharedPreferencesService {
     return _preferences?.getBool(key);
   }
 
+  // Save an integer value
+  Future<void> saveInt(String key, int value) async {
+    await _preferences?.setInt(key, value);
+  }
+
+  // Get an integer value
+  int? getInt(String key) {
+    return _preferences?.getInt(key);
+  }
+
   // Clear specific key
   Future<void> clearKey(String key) async {
     await _preferences?.remove(key);
