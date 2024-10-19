@@ -41,11 +41,8 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
     });
 
     try {
-      // Get the selected exercises from ExerciseAPI
-      final selectedExercises = exerciseAPI.selectedExercises;
-
       // Start audio workout
-      await audioWorkoutAPI.startAudioWorkout(selectedExercises);
+      await audioWorkoutAPI.startAudioWorkout();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
@@ -100,16 +97,17 @@ class _AudioWorkoutWidgetState extends State<AudioWorkoutWidget> {
           const SizedBox(height: 20),
 
           // Start/Stop buttons
-          ElevatedButton(
-            onPressed: isWorkoutActive ? null : _startWorkout,
-            child: const Text('Start Audio Workout'),
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: isWorkoutActive ? _stopWorkout : null,
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Stop Audio Workout'),
-          ),
+          if (!isWorkoutActive)
+            ElevatedButton(
+              onPressed: _startWorkout,
+              child: const Text('Start Audio Workout'),
+            )
+          else
+            ElevatedButton(
+              onPressed: _stopWorkout,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('Stop Audio Workout'),
+            ),
         ],
       ),
     );

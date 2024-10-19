@@ -52,7 +52,11 @@ class AudioWorkoutAPI {
   }
 
   // Function to start the workout
-  Future<void> startAudioWorkout(List<String> selectedExercises) async {
+  Future<void> startAudioWorkout() async {
+    // Load the latest selected exercises from SharedPreferences
+    List<String> selectedExercises =
+        SharedPreferencesService().getStringList('selectedExercises') ?? [];
+
     if (selectedExercises.isEmpty) {
       throw Exception("No exercises selected.");
     }
