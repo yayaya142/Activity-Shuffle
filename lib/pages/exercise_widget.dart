@@ -1,7 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:sharp_shooter_pro/services/exercise_api.dart';
+import 'package:sharp_shooter_pro/theme.dart';
+
+const double selectTodayExercisesSize = 24.0;
 
 class ExerciseWidget extends StatefulWidget {
   const ExerciseWidget({super.key});
@@ -12,7 +14,7 @@ class ExerciseWidget extends StatefulWidget {
 
 class _ExerciseWidgetState extends State<ExerciseWidget> {
   ExerciseAPI exerciseAPI = ExerciseAPI();
-  String? selectedExercise; // Track the selected exercise
+  List<String> selectedExercises = []; // Track selected exercises
 
   // Method to show a dialog for adding a new exercise
   void _showAddExerciseDialog() {
@@ -56,6 +58,40 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     );
   }
 
+  // Method to show a confirmation dialog before deleting exercises
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Selected Exercises'),
+          content: const Text(
+              'Are you sure you want to delete the selected exercises?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Confirm deletion
+                setState(() {
+                  // Delete selected exercises
+                  for (String exerciseName in selectedExercises.toList()) {
+                    exerciseAPI.deleteExercise(exerciseName);
+                  }
+                  selectedExercises.clear(); // Clear selections after deletion
+                });
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: const Text('Yes, Delete'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), // Cancel deletion
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // Method to speak the selected exercise
   void _speakExercise(String name) async {
     await exerciseAPI.speakExercise(name);
@@ -63,57 +99,72 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Select Today\'s Exercises',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 20),
-
-        // List of exercises
-        Expanded(
-          child: ListView.builder(
-            itemCount: exerciseAPI.exercises.length,
-            itemBuilder: (context, index) {
-              Exercise exercise = exerciseAPI.exercises[index];
-              return ListTile(
-                title: Text(
-                  exercise.name,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Row for title and Add Exercise button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Expanded(
+                child: Text(
+                  'Select Today\'s Exercises',
                   style: TextStyle(
-                    color: selectedExercise == exercise.name
-                        ? Colors.blue
-                        : Colors.grey,
-                  ),
+                      fontSize: selectTodayExercisesSize,
+                      fontWeight: FontWeight.bold),
                 ),
-                onTap: () {
-                  setState(() {
-                    selectedExercise =
-                        exercise.name; // Update selected exercise
-                    _speakExercise(exercise.name); // Speak exercise name
-                  });
-                },
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
+              ),
+              // Add Exercise button
+              IconButton(
+                icon: const Icon(Icons.add),
+                color: Colors.green,
+                onPressed: _showAddExerciseDialog,
+              ),
+              IconButton(
+                  icon: const Icon(Icons.delete),
+                  color: Colors.red,
+                  onPressed: _showDeleteConfirmationDialog),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Multi-select choice chips
+          Wrap(
+            spacing: 8.0, // Space between chips
+            children: exerciseAPI.exercises.map((exercise) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 4.0), // Padding between each chip
+                child: ChoiceChip(
+                  label: Text(exercise.name),
+                  selected: selectedExercises.contains(exercise.name),
+                  selectedColor:
+                      ThemeColors().selectExerciseButtonColorSelected,
+                  backgroundColor:
+                      ThemeColors().selectExerciseButtonColorNotSelected,
+                  labelStyle: TextStyle(
+                    color: selectedExercises.contains(exercise.name)
+                        ? ThemeColors().selectExerciseTextColorSelected
+                        : ThemeColors().selectExerciseTextColorNotSelected,
+                  ),
+                  onSelected: (bool selected) {
                     setState(() {
-                      exerciseAPI
-                          .deleteExercise(exercise.name); // Delete exercise
+                      if (selected) {
+                        selectedExercises.add(exercise.name);
+                        _speakExercise(exercise.name); // Speak exercise name
+                      } else {
+                        selectedExercises.remove(exercise.name);
+                      }
                     });
                   },
                 ),
               );
-            },
+            }).toList(),
           ),
-        ),
-
-        // Button to add a new exercise
-        ElevatedButton(
-          onPressed: _showAddExerciseDialog,
-          child: const Text('Add Exercise'),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

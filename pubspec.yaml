@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   audioplayers: ^0.20.1
   flutter_tts: ^4.0.2
-
+  multi_select_flutter: ^4.1.3
 
 
 

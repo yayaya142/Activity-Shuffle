@@ -6,6 +6,9 @@ class ExerciseAPI {
     Exercise(name: "Target B", ttsFile: "target_b.mp3"),
     Exercise(name: "Target C", ttsFile: "target_c.mp3"),
     Exercise(name: "Target D", ttsFile: "target_d.mp3"),
+    Exercise(name: "Target E", ttsFile: "target_e.mp3"),
+    Exercise(name: "Target F", ttsFile: "target_f.mp3"),
+    Exercise(name: "Target G", ttsFile: "target_g.mp3"),
   ];
 
   // Text-to-Speech instance

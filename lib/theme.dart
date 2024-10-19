@@ -11,4 +11,10 @@ class ThemeColors {
 // timer colors
   Color timerOptionsTextColor = Colors.black;
   Color timerOptionsBackgroundColor = Colors.white;
+
+// select exercise colors
+  Color selectExerciseButtonColorNotSelected = Colors.grey;
+  Color selectExerciseTextColorNotSelected = Colors.black;
+  Color selectExerciseTextColorSelected = Colors.white;
+  Color selectExerciseButtonColorSelected = Colors.blue;
 }
