@@ -30,28 +30,27 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  # my packages
   cupertino_icons: ^1.0.8
   just_audio: ^0.9.18
   flutter_tts: ^4.0.2
   multi_select_flutter: ^4.1.3
   shared_preferences: ^2.3.2
+  flutter_launcher_icons: ^0.13.1
 
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^4.0.0
+
+
+  # add app icon
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/Logo.png"
 
 # The following section is specific to Flutter packages.
 flutter:
